@@ -44,10 +44,10 @@ export default class GameManager {
         this.canvas.addEventListener("touchend", this.onTouchend)
         this.canvas.addEventListener("touchmove", this.onTouchmove)
         // 初始化资源
-        Promise.all([fetch("/audio/burst.mp3")
+        Promise.all([fetch(`${process.env.NEXT_PUBLIC_BASE_PATH}/audio/burst.mp3`)
             .then(value => value.arrayBuffer()).then(value => this.audioContext.decodeAudioData(value)).then(value => {
                 this.burstBuffer = value
-            }), fetch("/audio/fire.mp3").then(value => value.arrayBuffer()).then(value => this.audioContext.decodeAudioData(value)).then(value => this.fireBuffer = value)]).then(() => {
+            }), fetch(`${process.env.NEXT_PUBLIC_BASE_PATH}/audio/fire.mp3`).then(value => value.arrayBuffer()).then(value => this.audioContext.decodeAudioData(value)).then(value => this.fireBuffer = value)]).then(() => {
             this.onLoad && this.onLoad()
         })
     }
