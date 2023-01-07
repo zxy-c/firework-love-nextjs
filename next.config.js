@@ -10,6 +10,7 @@ const nextConfig = {
     });
     return config;
   },
+  basePath:process.env.NODE_ENV==="development"?"":"/firework-love-nextjs"
 
 }
 
