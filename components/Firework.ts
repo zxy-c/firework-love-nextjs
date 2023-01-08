@@ -32,6 +32,8 @@ export class Firework{
     lightTime:number = Firework.initialLightTime
     static initialLightTime = 1000
 
+    onActive?:()=>void
+
 
     constructor(private canvas:HTMLCanvasElement,private     burstBuffer?: AudioBuffer,
     fireBuffer?: AudioBuffer,
@@ -148,6 +150,7 @@ export class Firework{
                     fireFlower.active=true
                 }
                 context2D.closePath()
+                this.onActive && this.onActive()
                 return true
             }else {
                 context2D.closePath()

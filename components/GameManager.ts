@@ -1,6 +1,8 @@
 import {Firework} from "./Firework";
 import {Point} from "../utils/BezierUtils";
 import RandomUtils from "../utils/RandomUtils";
+import TouchLove from "./TouchLove";
+import ArrayUtils from "@zxy-cn/array-utils";
 
 export default class GameManager {
     prevTime: number = -1
@@ -14,6 +16,16 @@ export default class GameManager {
     burstBuffer?: AudioBuffer
     fireBuffer?: AudioBuffer
     audioContext = new AudioContext();
+
+    touchLoves: Array<TouchLove> = []
+
+    private activeFireworkCountdown = 5
+
+    get quickFire() {
+        return this.activeFireworkCountdown <= 0
+    }
+
+    private quickFireTime = 10000
 
     onTouchstart = () => {
         this.touched = true
@@ -33,7 +45,14 @@ export default class GameManager {
         event.preventDefault()
         let touch = event.touches.item(0);
         if (touch) {
-            this.touchPoints.push([touch.clientX, touch.clientY])
+            let x = touch.clientX;
+            let y = touch.clientY;
+            this.touchPoints.push([x, y])
+            let touchLove = new TouchLove(this.canvas, x, y);
+            touchLove.onDispose = () => {
+                ArrayUtils.remove(this.touchLoves, touchLove)
+            }
+            this.touchLoves.push(touchLove)
         }
 
     }
@@ -56,21 +75,42 @@ export default class GameManager {
         this.nextFireTime += RandomUtils.randomNumberFromRange(400, 1200)
     }
 
+    computeNextQuickFireTime() {
+        this.nextFireTime += RandomUtils.randomNumberFromRange(100, 200)
+    }
+
     fire() {
-        this.fireworks.push(new Firework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext))
+        let firework = new Firework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+        firework.onActive = () => {
+            this.activeFireworkCountdown -= 1
+        }
+        this.fireworks.push(firework)
     }
 
     update(time: number) {
         const delayTime = this.prevTime === -1 ? 0 : time - this.prevTime
+        if (this.quickFire) {
+            this.quickFireTime -= delayTime
+        }
         if (this.nextFireTime <= time) {
-            this.fire()
-            this.computeNextFireTime()
+            if (this.quickFire && this.quickFireTime >= 0) {
+                ArrayUtils.generate(Math.round(RandomUtils.randomNumberFromRange(1, 3)), index => {
+                    this.fire()
+                })
+                this.computeNextQuickFireTime()
+            } else {
+                this.fire()
+                this.computeNextFireTime()
+            }
         }
         let context2D = this.canvas.getContext("2d")!;
         context2D.fillStyle = "black"
         context2D.fillRect(0, 0, this.canvas.width, this.canvas.height)
         this.fireworks.forEach(firework => {
             firework.update(delayTime)
+        })
+        this.touchLoves.forEach(touchLove => {
+            touchLove.update(delayTime)
         })
         this.prevTime = time
         this.requestNextFrame()
