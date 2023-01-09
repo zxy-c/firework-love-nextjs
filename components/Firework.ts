@@ -6,7 +6,7 @@ import FireFlower from "./FireFlower";
 import HeartUtils from "../utils/HeartUtils";
 import {Point} from "../utils/BezierUtils";
 
-export class Firework{
+export abstract class Firework{
 
     static maxYInitialSpeed = 4.5
     static minYInitialSpeed = 3.5
@@ -36,9 +36,9 @@ export class Firework{
 
     onDispose?:()=>void
 
-    constructor(private canvas:HTMLCanvasElement,private     burstBuffer?: AudioBuffer,
-    fireBuffer?: AudioBuffer,
-    private audioContext = new AudioContext(),) {
+    constructor(protected canvas:HTMLCanvasElement, private     burstBuffer?: AudioBuffer,
+                fireBuffer?: AudioBuffer,
+                private audioContext = new AudioContext(),) {
         if (fireBuffer!=null){
             const bufferSource = this.audioContext.createBufferSource();
             // bufferSource.playbackRate.value = scaledPlaybackRate;
@@ -84,17 +84,14 @@ export class Firework{
                 bufferSource.connect(gainNode).connect(this.audioContext.destination);
                 bufferSource.start(0);
             }
-            const shortBorderSize = Math.min(this.canvas.height,this.canvas.width)
-            const heartSize = Math.round(RandomUtils.randomNumberFromRange(shortBorderSize/100,shortBorderSize/50))
-            const pointCount  = heartSize * 10
-            ArrayUtils.generate(pointCount,index => {
-                let t = index/pointCount * 2 * Math.PI;
-                let fireFlower = new FireFlower(this.canvas,this.color,this.x,this.y,this.x+HeartUtils.getHeartX(heartSize,t),this.y+HeartUtils.getHeartY(heartSize,t));
+            this.getFireFlowerRelativePoints().forEach(([x,y])=>{
+                let fireFlower = new FireFlower(this.canvas,this.color,this.x,this.y,this.x+x,this.y+y);
                 fireFlower.onDispose = ()=>{
                     ArrayUtils.remove(this.fireFlowers,fireFlower)
                 }
                 this.fireFlowers.push(fireFlower)
             })
+
 
         } else {
             this.explodeCountdown-=delayTime
@@ -164,6 +161,8 @@ export class Firework{
 
         return false
     }
+
+    abstract  getFireFlowerRelativePoints():Array<Point>
 
 
 }

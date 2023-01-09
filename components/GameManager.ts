@@ -4,6 +4,8 @@ import RandomUtils from "../utils/RandomUtils";
 import TouchLove from "./TouchLove";
 import ArrayUtils from "@zxy-cn/array-utils";
 import opentype, {Font} from "opentype.js"
+import {getTextDensePoints} from "../utils/TextPathUtils";
+import LoveFirework from "./LoveFirework";
 
 export default class GameManager {
     prevTime: number = -1
@@ -24,13 +26,26 @@ export default class GameManager {
 
     texts: Array<string> = ["2023", "新年快乐"]
 
+    currentTextIndex:number = -1
+    /**
+     * 展示完一排文字后
+     * 下一次展示的时间
+     */
+    static initialNextTextIndexTime:number = 6000
+    nextTextIndexTime = 0
+
     font ?: Font;
 
     get quickFire() {
         return this.activeFireworkCountdown <= 0
     }
 
-    private quickFireTime = 10000
+    private quickFireTime = /*10000*/0
+
+    /**
+     * 快速连续烟花结束后，展示文字之前延迟的时间
+     */
+    static textShowDelay:number = /*4000*/0
 
     constructor(private canvas: HTMLCanvasElement) {
         this.canvas.addEventListener("mousedown", this.onTouchstart)
@@ -109,7 +124,7 @@ export default class GameManager {
     }
 
     fire() {
-        let firework = new Firework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+        let firework = new LoveFirework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
         firework.onDispose = ()=>{
             ArrayUtils.remove(this.fireworks,firework)
         }
@@ -120,13 +135,50 @@ export default class GameManager {
     }
 
     update(time: number) {
+        let context2D = this.canvas.getContext("2d")!;
         const delayTime = this.prevTime === -1 ? 0 : time - this.prevTime
         if (this.quickFire) {
             this.quickFireTime -= delayTime
-        } else if (this.quickFireTime >= 0) {
-            // 文字展出
-            if(this.texts.length>=0){
+        }
+        if (this.quickFireTime <= 0) {
+            this.fireworks.forEach(firework=>{
+                firework.fireFlowers.forEach(fireFlower=>{
+                    fireFlower.active = false
+                })
+            })
+            if (this.quickFireTime+GameManager.textShowDelay<=0){
+                // 文字展出
+                if(this.texts.length>=0){
+                    if (this.nextTextIndexTime<=0){
+                        this.nextTextIndexTime = GameManager.initialNextTextIndexTime
+                        this.currentTextIndex +=1
+                        const fontSize = 500
 
+                        let text = this.texts[this.currentTextIndex];
+                        if (text && this.font!=null){
+                            for (let i = 0; i < text.length; i++) {
+                                let glyph = this.font?.charToGlyph(text.charAt(i));
+                                if (glyph){
+                                    let metrics = glyph.getMetrics();
+                                    let char = text.charAt(i);
+                                    context2D.font = `${fontSize}px`
+                                    console.log(glyph,metrics,this.font,char,context2D.measureText(char))
+
+                                    let number = metrics.yMax - metrics.yMin;
+                                    // getTextDensePoints(glyph,0,0,fontSize).map(point=>{
+                                    //     let firework = new LoveFirework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+                                    //     firework.onDispose = ()=>{
+                                    //         ArrayUtils.remove(this.fireworks,firework)
+                                    //     }
+                                    //     this.fireworks.push(firework)
+                                    // })
+                                }
+
+                            }
+                        }
+                    }
+
+                }
             }
         }
         if (this.nextFireTime <= time) {
@@ -140,7 +192,7 @@ export default class GameManager {
                 this.computeNextFireTime()
             }
         }
-        let context2D = this.canvas.getContext("2d")!;
+
         context2D.fillStyle = "black"
         context2D.fillRect(0, 0, this.canvas.width, this.canvas.height)
         this.fireworks.forEach(firework => {
