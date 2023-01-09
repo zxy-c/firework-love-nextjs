@@ -34,6 +34,7 @@ export class Firework{
 
     onActive?:()=>void
 
+    onDispose?:()=>void
 
     constructor(private canvas:HTMLCanvasElement,private     burstBuffer?: AudioBuffer,
     fireBuffer?: AudioBuffer,
@@ -60,7 +61,9 @@ export class Firework{
         let context2D = this.canvas.getContext("2d")!;
         if(this.exploded){
             this.lightTime -= delayTime
-            if (this.lightTime>=0){
+            if (!this.fireFlowers.some(it=>!it.dead)){
+                this.onDispose && this.onDispose()
+            }else if (this.lightTime>=0){
                 let canvasGradient = context2D.createRadialGradient(this.x,this.y,0,this.x,this.y,Math.max(Math.abs(this.x),Math.abs(this.y)));
                 canvasGradient.addColorStop(0,ColorUtils.rgbaWithHexOpacity(this.color,this.lightTime/Firework.initialLightTime * 0.1))
                 canvasGradient.addColorStop(1,"rgba(255,255,255,0)")

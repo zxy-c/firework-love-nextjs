@@ -25,6 +25,10 @@ export default class FireFlower {
         return this.deadTime - this.stopTime
     }
 
+    get dead():boolean{
+        return this.deadTime <= 0
+    }
+
     constructor(private canvas: HTMLCanvasElement,   public color: string, public x: number,public y: number, private destinationX: number,private destinationY: number) {
         this.yDeceleration = -this.canvas.height / 50
         this.xDeceleration = -this.canvas.width / 50

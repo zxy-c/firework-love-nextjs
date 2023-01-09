@@ -50,7 +50,6 @@ export default class GameManager {
             new Promise<Font | undefined>((resolve, reject) => {
                 opentype.load(`${process.env.NEXT_PUBLIC_BASE_PATH}/fonts/华文楷体.ttf`, (error, font) => {
                     if (error) {
-                        console.error(error)
                         reject(error)
                     } else {
                         resolve(font)
@@ -111,6 +110,9 @@ export default class GameManager {
 
     fire() {
         let firework = new Firework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+        firework.onDispose = ()=>{
+            ArrayUtils.remove(this.fireworks,firework)
+        }
         firework.onActive = () => {
             this.activeFireworkCountdown -= 1
         }
@@ -123,7 +125,9 @@ export default class GameManager {
             this.quickFireTime -= delayTime
         } else if (this.quickFireTime >= 0) {
             // 文字展出
+            if(this.texts.length>=0){
 
+            }
         }
         if (this.nextFireTime <= time) {
             if (this.quickFire && this.quickFireTime >= 0) {
