@@ -17,6 +17,7 @@ export default function Home() {
       context2D.fillStyle = "black"
       context2D.fillRect(0,0,canvas.width,canvas.height)
       let gameManager = new GameManager(canvas);
+
     // opentype.load("/fonts/华文楷体.ttf",(error, font) => {
     //
     //
