@@ -32,6 +32,22 @@ export default class GameManager {
         this.touchPoints = []
     }
 
+    onMousemove = (event:MouseEvent)=>{
+        event.preventDefault()
+        if (this.touched){
+            this.addTouchLove(event.x,event.y)
+        }
+    }
+
+    addTouchLove(x:number,y:number){
+        this.touchPoints.push([x, y])
+        let touchLove = new TouchLove(this.canvas, x, y);
+        touchLove.onDispose = () => {
+            ArrayUtils.remove(this.touchLoves, touchLove)
+        }
+        this.touchLoves.push(touchLove)
+    }
+
     onTouchend = () => {
         this.touched = false
         for (let firework of this.fireworks) {
@@ -45,20 +61,15 @@ export default class GameManager {
         event.preventDefault()
         let touch = event.touches.item(0);
         if (touch) {
-            let x = touch.clientX;
-            let y = touch.clientY;
-            this.touchPoints.push([x, y])
-            let touchLove = new TouchLove(this.canvas, x, y);
-            touchLove.onDispose = () => {
-                ArrayUtils.remove(this.touchLoves, touchLove)
-            }
-            this.touchLoves.push(touchLove)
+            this.addTouchLove(touch.clientX,touch.clientY)
         }
-
     }
 
     constructor(private canvas: HTMLCanvasElement) {
         this.requestNextFrame()
+        this.canvas.addEventListener("mousedown", this.onTouchstart)
+        this.canvas.addEventListener("mouseup", this.onTouchend)
+        this.canvas.addEventListener("mousemove",this.onMousemove)
         this.canvas.addEventListener("touchstart", this.onTouchstart)
         this.canvas.addEventListener("touchend", this.onTouchend)
         this.canvas.addEventListener("touchmove", this.onTouchmove)
@@ -123,6 +134,9 @@ export default class GameManager {
     }
 
     dispose() {
+        this.canvas.removeEventListener("mousedown", this.onTouchstart)
+        this.canvas.removeEventListener("mouseup", this.onTouchend)
+        this.canvas.removeEventListener("mousemove",this.onMousemove)
         this.canvas.removeEventListener("touchstart", this.onTouchstart)
         this.canvas.removeEventListener("touchend", this.onTouchend)
         this.canvas.removeEventListener("touchend", this.onTouchmove)
