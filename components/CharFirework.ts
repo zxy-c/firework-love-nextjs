@@ -5,6 +5,9 @@ import ArrayUtils from "@zxy-cn/array-utils";
 import {Point} from "../utils/BezierUtils";
 import {Glyph} from "opentype.js";
 
+/**
+ * 从文字中心散开
+ */
 export default class CharFirework extends Firework {
 
     yOffset = 0

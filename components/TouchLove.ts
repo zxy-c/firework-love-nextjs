@@ -5,6 +5,9 @@ import ColorUtils from "../utils/ColorUtils";
 export default class TouchLove{
 
     static initialDeadTime:number = 800
+    /**
+     * 特效消失的时间
+     */
     deadTime:number = TouchLove.initialDeadTime
 
     onDispose?:()=>void

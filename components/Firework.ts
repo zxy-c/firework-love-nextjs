@@ -18,18 +18,43 @@ export abstract class Firework{
 
     ySpeed :number
     x:number
+    /**
+     * 点的半径
+     */
     radius = 1
+    /**
+     * y轴减速度
+     */
     yDeceleration:number
     y:number
+    /**
+     * 爆炸倒计时
+     */
     explodeCountdown:number
+    /**
+     * 是否已爆炸
+     */
     exploded = false
     color:string
+    /**
+     * 火光生成的半径
+     */
     static fireLightGenerateRadius = 3
+    /**
+     * 下次生成火光的倒计时
+     */
     nextFireLightCountdown = 50
     fireLights:Array<FireLight> = []
     fireFlowers:Array<FireFlower> = []
+    /**
+     * 可选的颜色
+     */
     static selectableColors = ["#FF5252","#FF4081","#E040FB","#7C4DFF","#536DFE","#448AFF","#40C4FF","#18FFFF","#64FFDA","#69F0AE","#B2FF59","#EEFF41","#FFFF00","#FFD740","#FFAB40"]
+
     lightTime:number = Firework.initialLightTime
+    /**
+     * 爆炸后产生光芒照亮场景的持续时间
+     */
     static initialLightTime = 1000
 
     onActive?:()=>void

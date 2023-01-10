@@ -9,22 +9,45 @@ import CharFirework from "./CharFirework";
 
 export default class GameManager {
     prevTime: number = -1
-    nextFireTime: number = 2000
+    /**
+     * 下一次开火的时间
+     */
+    nextFireTime: number = 1000
+    /**
+     * 烟花
+     */
     fireworks: Array<Firework> = []
-
+    /**
+     * 触摸状态
+     */
     touched = false
+    /**
+     * 触摸的路径点
+     */
     touchPoints: Point[] = []
     onLoad?: () => void
     burstBuffer?: AudioBuffer
     fireBuffer?: AudioBuffer
     audioContext = new AudioContext();
 
+    /**
+     * 触摸所带的爱心
+     */
     touchLoves: Array<TouchLove> = []
 
+    /**
+     * 需要激活的烟花的数量
+     */
     private activeFireworkCountdown = 5
 
+    /**
+     * 展示的文字
+     */
     texts: Array<string> = ["2023", "新年快乐","大展宏兔"]
 
+    /**
+     * 当前展示的文字的索引
+     */
     currentTextIndex:number = -1
     /**
      * 展示完一排文字后
@@ -39,6 +62,9 @@ export default class GameManager {
         return this.activeFireworkCountdown <= 0
     }
 
+    /**
+     * 快速开火所持续的时间
+     */
     private quickFireTime = 10000
 
     /**

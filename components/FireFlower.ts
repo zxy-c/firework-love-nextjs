@@ -15,11 +15,20 @@ export default class FireFlower {
 
     radius = 1
 
+    /**
+     * 停止扩散时间
+     */
     stopTime: number = 2
     fireLights:FireLight[] = []
     nextFireLightCountdown:number = 20
     static fireLightGenerateRadius = 5
+    /**
+     * 消失时间
+     */
     deadTime:number = 4
+    /**
+     * 当前火花是否被激活
+     */
     active = false
     get keepTime(){
         return this.deadTime - this.stopTime
