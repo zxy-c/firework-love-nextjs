@@ -6,6 +6,7 @@ import ArrayUtils from "@zxy-cn/array-utils";
 import opentype, {Font} from "opentype.js"
 import {getTextDensePoints} from "../utils/TextPathUtils";
 import LoveFirework from "./LoveFirework";
+import CharFirework from "./CharFirework";
 
 export default class GameManager {
     prevTime: number = -1
@@ -152,30 +153,43 @@ export default class GameManager {
                     if (this.nextTextIndexTime<=0){
                         this.nextTextIndexTime = GameManager.initialNextTextIndexTime
                         this.currentTextIndex +=1
-                        const fontSize = 500
-
+                        let width = this.canvas.width;
+                        const fontSize = width/ 6
+                        context2D.font = `${fontSize}px hwxk`
                         let text = this.texts[this.currentTextIndex];
+                        const textSpacing = width / 24
                         if (text && this.font!=null){
+                            const charArray = Array.from(text)
+                            let textMetrics = charArray.map(char=>context2D.measureText(char));
+                            const computeTextWidth=(textMetric:TextMetrics)=>{
+                                // if (this.canvas.height>this.canvas.width){
+                                //     return textMetric.actualBoundingBoxAscent + textMetric.actualBoundingBoxDescent
+                                // }else {
+                                    return textMetric.width
+                                // }
+                            }
+                            const textBoxWidth = (text.length - 1) * textSpacing + ArrayUtils.sum(textMetrics.map(it=>{
+                                return computeTextWidth(it)
+                            }))
+                            let offset = (width - textBoxWidth)/2
                             for (let i = 0; i < text.length; i++) {
                                 let glyph = this.font?.charToGlyph(text.charAt(i));
                                 if (glyph){
-                                    let metrics = glyph.getMetrics();
                                     let char = text.charAt(i);
-                                    context2D.font = `${fontSize}px`
-                                    console.log(glyph,metrics,this.font,char,context2D.measureText(char))
 
-                                    let number = metrics.yMax - metrics.yMin;
-                                    // getTextDensePoints(glyph,0,0,fontSize).map(point=>{
-                                    //     let firework = new LoveFirework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
-                                    //     firework.onDispose = ()=>{
-                                    //         ArrayUtils.remove(this.fireworks,firework)
-                                    //     }
-                                    //     this.fireworks.push(firework)
-                                    // })
+
+                                    let charFirework = new CharFirework(glyph,textMetrics[i],offset,fontSize,this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+                                    charFirework.onDispose = ()=>{
+                                        ArrayUtils.remove(this.fireworks,charFirework)
+                                    }
+                                    this.fireworks.push(charFirework)
+                                    offset += textSpacing + computeTextWidth(textMetrics[i])
                                 }
 
                             }
                         }
+                    }else {
+                        this.nextTextIndexTime -=delayTime
                     }
 
                 }

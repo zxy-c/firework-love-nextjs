@@ -1,9 +1,9 @@
 import ArrayUtils from "@zxy-cn/array-utils";
 import {Font, Glyph} from "opentype.js";
-import BezierUtils from "./BezierUtils";
+import BezierUtils, {Point} from "./BezierUtils";
 import {func} from "prop-types";
 
-export function getTextDensePoints( glyph:Glyph, x:number, y:number, fontSize:number){
+export function getTextDensePoints( glyph:Glyph, x:number, y:number, fontSize:number):Array<Point>{
     const pointDistance = 5;
     let path = glyph.getPath(x,y,fontSize);
     return path.commands.flatMap((command,index)=>{
@@ -49,6 +49,8 @@ export function getTextDensePoints( glyph:Glyph, x:number, y:number, fontSize:nu
             }else {
                 return []
             }
+        }else {
+            return []
         }
-    })
+    }).filter(it=>it.length==2).map(it => it as Point)
 }

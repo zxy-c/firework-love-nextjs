@@ -40,7 +40,6 @@ function getThreeOrderBezierLength( p1:Point, cp1:Point, cp2:Point, p2:Point):nu
 function getTwoOrderBezierLength(  p1:Point, cp:Point, p2:Point):number{
     let points = ArrayUtils.generate(101, index => 0.01 * index)
         .map(it=>getTwoOrderBezierPoint(it,p1,cp,p2));
-    console.error(points)
     let length = 0
     for (let i = 0; i < points.length-1; i++) {
         length += computeDistanceBetweenTwoPoints(points[i],points[i+1])

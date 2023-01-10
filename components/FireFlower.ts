@@ -42,9 +42,7 @@ export default class FireFlower {
             this.ySpeed = 0
         }else {
             this.ySpeed = (Math.abs(destinationY - y) - this.yDeceleration * Math.pow(this.stopTime, 2) / 2) / this.stopTime /** (destinationY>= y ?1:-1)*/
-            // this.ySpeed = (destinationY - y) /this.deadTime
         }
-        // console.error(this.xSpeed,destinationX,x,this.xDeceleration,this.deadTime,Math.abs(destinationX - x),Math.abs(destinationY - x) - this.yDeceleration * Math.pow(this.deadTime, 2) / 2 )
     }
 
     update(delayTime:number){
