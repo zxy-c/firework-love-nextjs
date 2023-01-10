@@ -1,11 +1,6 @@
-import { Inter } from '@next/font/google'
 import styles from './index.module.sass'
 import {useEffect, useRef} from "react";
-import opentype from "opentype.js"
-import BezierUtils from "../utils/BezierUtils";
-import ArrayUtils from "@zxy-cn/array-utils";
 import GameManager from "../components/GameManager";
-const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   useEffect(()=>{
@@ -32,7 +27,7 @@ export default function Home() {
     let canvasRef = useRef<HTMLCanvasElement|null>(null);
   return (
     <>
-      <canvas className={styles.canvas} ref={canvasRef}>
+      <canvas ref={canvasRef}>
 
       </canvas>
     </>
