@@ -4,14 +4,12 @@ import RandomUtils from "../utils/RandomUtils";
 import TouchLove from "./TouchLove";
 import ArrayUtils from "@zxy-cn/array-utils";
 import opentype, {Font} from "opentype.js"
-import {getTextDensePoints} from "../utils/TextPathUtils";
 import LoveFirework from "./LoveFirework";
 import CharFirework from "./CharFirework";
 
 export default class GameManager {
     prevTime: number = -1
     nextFireTime: number = 2000
-    explosionTime: number = 2000
     fireworks: Array<Firework> = []
 
     touched = false
@@ -25,7 +23,7 @@ export default class GameManager {
 
     private activeFireworkCountdown = 5
 
-    texts: Array<string> = ["2023", "新年快乐"]
+    texts: Array<string> = ["2023", "新年快乐","大展宏兔"]
 
     currentTextIndex:number = -1
     /**
@@ -41,12 +39,12 @@ export default class GameManager {
         return this.activeFireworkCountdown <= 0
     }
 
-    private quickFireTime = /*10000*/0
+    private quickFireTime = 10000
 
     /**
      * 快速连续烟花结束后，展示文字之前延迟的时间
      */
-    static textShowDelay:number = /*4000*/0
+    static textShowDelay:number = 4000
 
     constructor(private canvas: HTMLCanvasElement) {
         this.canvas.addEventListener("mousedown", this.onTouchstart)
@@ -175,9 +173,6 @@ export default class GameManager {
                             for (let i = 0; i < text.length; i++) {
                                 let glyph = this.font?.charToGlyph(text.charAt(i));
                                 if (glyph){
-                                    let char = text.charAt(i);
-
-
                                     let charFirework = new CharFirework(glyph,textMetrics[i],offset,fontSize,this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
                                     charFirework.onDispose = ()=>{
                                         ArrayUtils.remove(this.fireworks,charFirework)
@@ -197,7 +192,7 @@ export default class GameManager {
         }
         if (this.nextFireTime <= time) {
             if (this.quickFire && this.quickFireTime >= 0) {
-                ArrayUtils.generate(Math.round(RandomUtils.randomNumberFromRange(1, 3)), index => {
+                ArrayUtils.generate(Math.round(RandomUtils.randomNumberFromRange(1, 3)), () => {
                     this.fire()
                 })
                 this.computeNextQuickFireTime()
