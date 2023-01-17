@@ -40,7 +40,7 @@ export default class GameManager {
     /**
      * 需要激活的烟花的数量
      */
-    private activeFireworkCountdown = 1
+    private activeFireworkCountdown = 5
 
     /**
      * 展示的文字
