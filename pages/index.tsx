@@ -1,8 +1,9 @@
 import styles from './index.module.sass'
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import GameManager from "../components/GameManager";
 
 export default function Home() {
+    const [loading,setLoading] = useState(true)
   useEffect(()=>{
       console.log("useEffect")
       const canvas = canvasRef.current!
@@ -12,14 +13,9 @@ export default function Home() {
       context2D.fillStyle = "black"
       context2D.fillRect(0,0,canvas.width,canvas.height)
       let gameManager = new GameManager(canvas);
-
-    // opentype.load("/fonts/华文楷体.ttf",(error, font) => {
-    //
-    //
-    //     console.log(canvas.width,canvas.height)
-    //     console.log(font)
-
-    // })
+      gameManager.onLoad = ()=>{
+          setLoading(false)
+      }
       return ()=>{
           gameManager.dispose()
       }
@@ -30,6 +26,10 @@ export default function Home() {
       <canvas ref={canvasRef}>
 
       </canvas>
+        {loading ? <div className={styles.loading}>
+            加载中
+        </div> : null}
+
     </>
   )
 }
