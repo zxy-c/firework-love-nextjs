@@ -7,6 +7,8 @@ import opentype, {Font} from "opentype.js"
 import LoveFirework from "./LoveFirework";
 import CharFirework from "./CharFirework";
 
+const qs = require('qs');
+
 export default class GameManager {
     prevTime: number = -1
     /**
@@ -38,12 +40,12 @@ export default class GameManager {
     /**
      * 需要激活的烟花的数量
      */
-    private activeFireworkCountdown = 5
+    private activeFireworkCountdown = 1
 
     /**
      * 展示的文字
      */
-    texts: Array<string> = [new Date().getFullYear().toString(), "新年快乐", "大展宏兔"]
+    texts: Array<string>
 
     /**
      * 当前展示的文字的索引
@@ -100,6 +102,16 @@ export default class GameManager {
                 this.onLoad && this.onLoad()
                 this.requestNextFrame()
             })
+
+        let query = qs.parse(location.search.replace("?",""));
+        let textList = query.textList;
+        if (textList && typeof textList === "string"){
+            this.texts = textList.split(",")
+        }else {
+            this.texts = [new Date().getFullYear().toString(), "新年快乐", "大展宏兔"]
+        }
+
+
     }
 
     onTouchstart = () => {
