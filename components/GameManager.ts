@@ -7,6 +7,8 @@ import opentype, {Font} from "opentype.js"
 import LoveFirework from "./LoveFirework";
 import CharFirework from "./CharFirework";
 
+const qs = require('qs');
+
 export default class GameManager {
     prevTime: number = -1
     /**
@@ -43,17 +45,17 @@ export default class GameManager {
     /**
      * 展示的文字
      */
-    texts: Array<string> = ["周树棋", "我要我们","在一起"]
+    texts: Array<string>
 
     /**
      * 当前展示的文字的索引
      */
-    currentTextIndex:number = -1
+    currentTextIndex: number = -1
     /**
      * 展示完一排文字后
      * 下一次展示的时间
      */
-    static initialNextTextIndexTime:number = 6000
+    static initialNextTextIndexTime: number = 6000
     nextTextIndexTime = 0
 
     font ?: Font;
@@ -70,7 +72,7 @@ export default class GameManager {
     /**
      * 快速连续烟花结束后，展示文字之前延迟的时间
      */
-    static textShowDelay:number = 4000
+    static textShowDelay: number = 4000
 
     constructor(private canvas: HTMLCanvasElement) {
         this.canvas.addEventListener("mousedown", this.onTouchstart)
@@ -100,6 +102,16 @@ export default class GameManager {
                 this.onLoad && this.onLoad()
                 this.requestNextFrame()
             })
+
+        let query = qs.parse(location.search.replace("?",""));
+        let textList = query.textList;
+        if (textList && typeof textList === "string"){
+            this.texts = textList.split(",")
+        }else {
+            this.texts = [new Date().getFullYear().toString(), "新年快乐", "大展宏兔"]
+        }
+
+
     }
 
     onTouchstart = () => {
@@ -150,8 +162,8 @@ export default class GameManager {
 
     fire() {
         let firework = new LoveFirework(this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
-        firework.onDispose = ()=>{
-            ArrayUtils.remove(this.fireworks,firework)
+        firework.onDispose = () => {
+            ArrayUtils.remove(this.fireworks, firework)
         }
         firework.onActive = () => {
             this.activeFireworkCountdown -= 1
@@ -166,42 +178,42 @@ export default class GameManager {
             this.quickFireTime -= delayTime
         }
         if (this.quickFireTime <= 0) {
-            this.fireworks.forEach(firework=>{
-                firework.fireFlowers.forEach(fireFlower=>{
+            this.fireworks.forEach(firework => {
+                firework.fireFlowers.forEach(fireFlower => {
                     fireFlower.active = false
                 })
             })
-            if (this.quickFireTime+GameManager.textShowDelay<=0){
+            if (this.quickFireTime + GameManager.textShowDelay <= 0) {
                 // 文字展出
-                if(this.texts.length>=0){
-                    if (this.nextTextIndexTime<=0){
+                if (this.texts.length >= 0) {
+                    if (this.nextTextIndexTime <= 0) {
                         this.nextTextIndexTime = GameManager.initialNextTextIndexTime
-                        this.currentTextIndex +=1
+                        this.currentTextIndex += 1
                         let width = this.canvas.width;
-                        const fontSize = width/ 6
+                        const fontSize = width / 6
                         context2D.font = `${fontSize}px hwxk`
                         let text = this.texts[this.currentTextIndex];
                         const textSpacing = width / 24
-                        if (text && this.font!=null){
+                        if (text && this.font != null) {
                             const charArray = Array.from(text)
-                            let textMetrics = charArray.map(char=>context2D.measureText(char));
-                            const computeTextWidth=(textMetric:TextMetrics)=>{
+                            let textMetrics = charArray.map(char => context2D.measureText(char));
+                            const computeTextWidth = (textMetric: TextMetrics) => {
                                 // if (this.canvas.height>this.canvas.width){
                                 //     return textMetric.actualBoundingBoxAscent + textMetric.actualBoundingBoxDescent
                                 // }else {
-                                    return textMetric.width
+                                return textMetric.width
                                 // }
                             }
-                            const textBoxWidth = (text.length - 1) * textSpacing + ArrayUtils.sum(textMetrics.map(it=>{
+                            const textBoxWidth = (text.length - 1) * textSpacing + ArrayUtils.sum(textMetrics.map(it => {
                                 return computeTextWidth(it)
                             }))
-                            let offset = (width - textBoxWidth)/2
+                            let offset = (width - textBoxWidth) / 2
                             for (let i = 0; i < text.length; i++) {
                                 let glyph = this.font?.charToGlyph(text.charAt(i));
-                                if (glyph){
-                                    let charFirework = new CharFirework(glyph,textMetrics[i],offset,fontSize,this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
-                                    charFirework.onDispose = ()=>{
-                                        ArrayUtils.remove(this.fireworks,charFirework)
+                                if (glyph) {
+                                    let charFirework = new CharFirework(glyph, textMetrics[i], offset, fontSize, this.canvas, this.burstBuffer, this.fireBuffer, this.audioContext);
+                                    charFirework.onDispose = () => {
+                                        ArrayUtils.remove(this.fireworks, charFirework)
                                     }
                                     this.fireworks.push(charFirework)
                                     offset += textSpacing + computeTextWidth(textMetrics[i])
@@ -209,8 +221,8 @@ export default class GameManager {
 
                             }
                         }
-                    }else {
-                        this.nextTextIndexTime -=delayTime
+                    } else {
+                        this.nextTextIndexTime -= delayTime
                     }
 
                 }
