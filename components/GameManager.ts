@@ -43,7 +43,7 @@ export default class GameManager {
     /**
      * 展示的文字
      */
-    texts: Array<string> = ["2023", "新年快乐","大展宏兔"]
+    texts: Array<string> = ["周树棋", "我要我们","在一起"]
 
     /**
      * 当前展示的文字的索引
