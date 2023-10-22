@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NEXT_PUBLIC_BASE_PATH=\"\" next dev -H 0.0.0.0",
+    "dev": "cross-env NEXT_PUBLIC_BASE_PATH=\"\" next dev -H 0.0.0.0 -p 3002",
     "build": "cross-env NEXT_PUBLIC_BASE_PATH=/firework-love-nextjs next build",
     "start": "next start",
     "lint": "next lint",

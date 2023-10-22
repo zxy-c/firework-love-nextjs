@@ -90,7 +90,7 @@ export default class GameManager {
             .then(value => this.audioContext.decodeAudioData(value))
             .then(value => this.fireBuffer = value),
             new Promise<Font | undefined>((resolve, reject) => {
-                opentype.load(`${process.env.NEXT_PUBLIC_BASE_PATH}/fonts/华文楷体.ttf`, (error, font) => {
+                opentype.load(`https://static-1302893210.cos.ap-shanghai.myqcloud.com/%E5%8D%8E%E6%96%87%E6%A5%B7%E4%BD%93.ttf`, (error, font) => {
                     if (error) {
                         reject(error)
                     } else {
